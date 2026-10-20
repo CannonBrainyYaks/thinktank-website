@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ThinkTank | Open Lab Clock</title>
+<style>
+:root{font-family:system-ui,sans-serif;color:#f5e8c9;background:#171c1d}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 25%,#344343,#171c1d 75%);display:grid;place-items:center;padding:24px}.wrap{text-align:center;width:min(900px,100%)}.eyebrow{color:#d8aa63;text-transform:uppercase;letter-spacing:.28em;font-weight:700}h1{font-family:Georgia,serif;font-size:clamp(2.3rem,7vw,5rem);margin:10px 0 5px}.sub{color:#c7bca4;font-size:1.2rem}.dial{margin:32px auto;width:min(68vw,390px);aspect-ratio:1;border-radius:50%;border:12px solid #ae7b41;box-shadow:0 0 0 5px #302c25,inset 0 0 0 5px #6e5939;display:grid;place-items:center;background:#1d2728}.time{font-size:clamp(3rem,9vw,5.7rem);font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:-.04em}.label{color:#e5bd7a;letter-spacing:.17em;font-weight:700}.status{font-size:clamp(1.5rem,4vw,2.5rem);font-weight:800;margin:20px 0}.schedule{color:#c6bba5}button{border:1px solid #b48a50;background:#b48a50;color:#161b1b;border-radius:9px;padding:13px 22px;font-weight:800;cursor:pointer;margin-top:20px}button:focus-visible{outline:3px solid white;outline-offset:4px}body.cleanup{background:#3c201b}body.cleanup .dial{border-color:#e47d4b}body.cleanup .status{color:#ffb38a}body.cleanup .label{color:#ffb38a}
+</style></head><body><main class="wrap"><div class="eyebrow">Cannon Middle School</div><h1>THINKTANK</h1><div class="sub">OPEN LAB CLOCK</div><section class="dial" aria-label="Time remaining"><div><div class="label" id="phase">READY TO CREATE</div><div class="time" id="count">--:--</div></div></section><div class="status" id="status" aria-live="polite">Checking schedule…</div><div class="schedule">Period 1 · 10:55–11:40 &nbsp; | &nbsp; Period 2 · 11:40–12:25<br>Cleanup begins 5 minutes before each period ends.</div><button id="full" type="button">Full screen</button></main><script>
+(function(){
+const count=document.getElementById('count'),phase=document.getElementById('phase'),status=document.getElementById('status'),button=document.getElementById('full');
+const fmt=n=>String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');
+function update(){const now=new Date();const t=now.getHours()*3600+now.getMinutes()*60+now.getSeconds();const a=10*3600+55*60,b=11*3600+40*60,c=12*3600+25*60;let remaining,label,message,clean=false;
+if(t<a){remaining=a-t;label='NEXT SESSION';message='Open Lab starts at 10:55';}
+else if(t<b){remaining=b-t;clean=remaining<=300;label=clean?'CLEAN UP':'PERIOD 1';message=clean?'Tools home · Scraps away · Tables clear':'Figure it out · Mentor · Community · Create';}
+else if(t<c){remaining=c-t;clean=remaining<=300;label=clean?'CLEAN UP':'PERIOD 2';message=clean?'Tools home · Scraps away · Tables clear':'Figure it out · Mentor · Community · Create';}
+else{remaining=0;label='ALL DONE';message='Open Lab complete for today';}
+document.body.classList.toggle('cleanup',clean);count.textContent=remaining?fmt(remaining):'00:00';phase.textContent=label;status.textContent=message;}
+update();setInterval(update,1000);
+button.addEventListener('click',async()=>{try{if(document.fullscreenElement){await document.exitFullscreen();}else if(document.documentElement.requestFullscreen){await document.documentElement.requestFullscreen();}}catch(e){button.textContent='Use browser full-screen mode';}});
+document.addEventListener('fullscreenchange',()=>button.textContent=document.fullscreenElement?'Exit full screen':'Full screen');
+})();
+</script></body></html>
