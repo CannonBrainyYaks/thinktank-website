@@ -26,7 +26,7 @@ function savePlanner(json,expectedRevision){
   if(revision!==expectedRevision)return {ok:false,error:'This planner changed on another device. Export your local backup, then reload before merging changes.'};
   const parsed=JSON.parse(json);
   if(!parsed.weeks||!Array.isArray(parsed.projects))throw new Error('Invalid planner data');
-  const chunks=json.match(/[\\s\\S]{1,40000}/g)||[''];
+  const chunks=Array.from({length:Math.ceil(json.length/40000)},(_,i)=>json.slice(i*40000,(i+1)*40000));
   const oldCount=Number(sheet.getRange('E2').getValue())||0;
   const count=Math.max(chunks.length,oldCount);
   if(sheet.getMaxRows()<count+1)sheet.insertRowsAfter(sheet.getMaxRows(),count+1-sheet.getMaxRows());
