@@ -1,0 +1,34 @@
+name: Deploy Weekly Planner to Apps Script
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'weekly-planner/google-apps-script/Code.gs'
+      - 'weekly-planner/google-apps-script/Index.html'
+      - 'weekly-planner/google-apps-script/.clasp.json'
+      - '.github/workflows/deploy-weekly-planner.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ vars.WEEKLY_PLANNER_AUTO_DEPLOY == 'enabled' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install clasp
+        run: npm install --global @google/clasp
+      - name: Configure Google authorization
+        env:
+          CLASP_CREDENTIALS: ${{ secrets.WEEKLY_PLANNER_CLASP_CREDENTIALS }}
+        run: |
+          test -n "$CLASP_CREDENTIALS" || { echo "Missing clasp credentials secret"; exit 1; }
+          printf '%s' "$CLASP_CREDENTIALS" > "$HOME/.clasprc.json"
+          chmod 600 "$HOME/.clasprc.json"
+      - name: Upload and publish new version
+        working-directory: weekly-planner/google-apps-script
+        run: |
+          clasp push --force
+          clasp deploy --deploymentId "${{ vars.WEEKLY_PLANNER_DEPLOYMENT_ID }}" --description "GitHub Actions ${{ github.sha }}"
