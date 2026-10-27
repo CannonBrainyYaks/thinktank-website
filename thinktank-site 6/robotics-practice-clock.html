@@ -24,6 +24,35 @@ button.secondary{background:#222;color:#fff}
 .warning .clock{background:linear-gradient(135deg,#5a280e,#1c100b);border-color:#ffba29}
 .break .clock{background:linear-gradient(135deg,#443900,#161400);border-color:#ffdc40}
 #screen:fullscreen{background:#fff9db}
+
+/* Riveted steel workshop treatment — CSS only, no image assets */
+:root{background:#252525;color:#f2e7b7}
+body{background:repeating-linear-gradient(135deg,#242424 0px,#242424 7px,#292929 7px,#292929 9px);color:#f2e7b7}
+header{padding:14px 20px;border-bottom:3px solid #d4ac27;background:linear-gradient(180deg,#4a4a4a,#202020);box-shadow:0 6px 18px #0008;position:relative}
+header:before,header:after{content:"";position:absolute;top:15px;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f5f5f5,#8b8b8b 44%,#333 72%);border:1px solid #111;box-shadow:inset 0 1px 2px #fff8,0 2px 3px #000b}
+header:before{left:17px}header:after{right:17px}
+header h1{color:#ffe071;text-shadow:0 3px 2px #000}
+header .eyebrow{color:#e6d39b}header p,.status{color:#c6c0aa}
+.now{color:#ffe071;text-shadow:0 2px 3px #000}
+.clock{position:relative;isolation:isolate;overflow:hidden;border:12px solid #777;background:linear-gradient(145deg,#333 0%,#171717 46%,#080808 100%);box-shadow:inset 0 0 0 3px #191919,inset 0 0 35px #000,0 10px 25px #0008;border-radius:18px}
+.clock:before{content:"";position:absolute;inset:5px;pointer-events:none;border:2px solid #b8b8b8;border-radius:7px;opacity:.75}
+.clock:after{content:"";position:absolute;inset:10px;pointer-events:none;background:radial-gradient(circle at 8px 8px,#eee 0 2px,#a6a6a6 3px,#444 5px,#151515 7px,transparent 8px) left top / 100% 100% no-repeat,radial-gradient(circle at calc(100% - 8px) 8px,#eee 0 2px,#a6a6a6 3px,#444 5px,#151515 7px,transparent 8px),radial-gradient(circle at 8px calc(100% - 8px),#eee 0 2px,#a6a6a6 3px,#444 5px,#151515 7px,transparent 8px),radial-gradient(circle at calc(100% - 8px) calc(100% - 8px),#eee 0 2px,#a6a6a6 3px,#444 5px,#151515 7px,transparent 8px);background-size:100% 100%;opacity:.9}
+.clock>.phase,.clock>.count,.clock>.range{position:relative;z-index:1}
+.phase{color:#ffcf32;text-shadow:0 2px 3px #000}
+.count{color:#fff;text-shadow:0 5px 12px #000}
+.range{color:#e4d8a3}
+.side{position:relative;background:linear-gradient(135deg,#d3d3d3,#a5a5a5 35%,#d6d6d6 65%,#a7a7a7);border:7px solid #555;color:#151515;box-shadow:inset 0 0 0 2px #eee,0 8px 20px #0006}
+.side:before{content:"";position:absolute;inset:8px;border:2px dashed #5556;pointer-events:none;border-radius:8px}
+.side h2,.side .next{color:#141414}.side .small,.side .help{color:#353535}
+.side input{border:2px solid #444;background:#f9f5df}
+.bar{border:3px solid #747474;background:#171717;box-shadow:inset 0 2px 5px #000}
+.fill{background:repeating-linear-gradient(135deg,#e7b81f 0 14px,#f5d34c 14px 28px)}
+button{background:linear-gradient(#ffe16a,#c79b16);color:#181818;border:2px solid #786015;box-shadow:0 3px 0 #6e5814}
+button.secondary{background:linear-gradient(#646464,#353535);color:white;border-color:#999;box-shadow:0 3px 0 #161616}
+.warning .clock{border-color:#dca927;background:linear-gradient(135deg,#532c0e,#1b100c)}
+.break .clock{border-color:#e2c02c;background:linear-gradient(135deg,#454019,#14140e)}
+#screen:fullscreen{background:#252525}
+@media(max-width:820px){header:before,header:after{width:10px;height:10px;top:10px}}
 </style></head><body><main id="screen"><header><div class="eyebrow">CANNON SCHOOL ROBOTICS</div><h1>Brainy Yaks Practice Clock</h1><p>3:00–4:30 PM · Figure it out. Build together.</p></header><div class="now" id="now">Loading time…</div><div class="layout"><section class="clock" aria-live="off"><div class="phase" id="phase">PRACTICE</div><div class="count" id="count">--:--</div><div class="range" id="range">3:00–4:30 PM</div></section><aside class="side"><h2>Practice Plan</h2><div class="next" id="next">Loading…</div><div class="small" id="nexttime"></div><label for="breakStart">Five-minute break starts at</label><input id="breakStart" type="time" min="15:00" max="16:20" step="300" value="15:45"><p class="help">Choose a time between 3:00 and 4:20 PM. Your choice is saved on this device. The break always lasts five minutes.</p><div class="small">Cleanup warning: <strong>4:25 PM</strong><br>Practice ends: <strong>4:30 PM</strong></div></aside></div><div class="bar"><div class="fill" id="fill"></div></div><div class="notice" id="notice"></div><div class="buttons"><button id="full">Full Screen</button><button class="secondary" id="reset">Reset Break to 3:45</button></div><div class="status">Times shown in Eastern Time · Settings are saved only in this browser.</div></main>
 <script>
 const $=id=>document.getElementById(id),tz='America/New_York',start=900,end=990,cleanup=985;const stored=localStorage.getItem('brainy-yaks-break');if(stored&&/^1[56]:[0-5][0-9]$/.test(stored))$('breakStart').value=stored;
