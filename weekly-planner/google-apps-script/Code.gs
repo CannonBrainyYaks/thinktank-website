@@ -40,3 +40,20 @@ function savePlanner(json,expectedRevision){
  }catch(e){return {ok:false,error:e.message}}
  finally{lock.releaseLock()}
 }
+
+function getCalendarWeek(weekStart){
+ try{
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(weekStart))throw new Error('Invalid week');
+  const zone='America/New_York';
+  const start=new Date(weekStart+'T00:00:00-04:00');
+  const finish=new Date(start.getTime()+8*24*60*60*1000);
+  const entries=CalendarApp.getDefaultCalendar().getEvents(start,finish).map(event=>({
+   id:event.getId(),title:event.getTitle(),
+   date:Utilities.formatDate(event.getStartTime(),zone,'yyyy-MM-dd'),
+   time:event.isAllDayEvent()?'All day':Utilities.formatDate(event.getStartTime(),zone,'h:mm a'),
+   end:event.isAllDayEvent()?'':Utilities.formatDate(event.getEndTime(),zone,'h:mm a'),
+   allDay:event.isAllDayEvent()
+  }));
+  return {ok:true,events:entries};
+ }catch(e){return {ok:false,error:e.message}}
+}
