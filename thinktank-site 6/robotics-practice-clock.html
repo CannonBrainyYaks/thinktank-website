@@ -2,6 +2,28 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#182e24"><title>Brainy Yaks | Practice Clock</title>
 <style>
 :root{font-family:Arial,Helvetica,sans-serif;color:#18362a;background:#f4f1e7}*{box-sizing:border-box}body{margin:0}main{max-width:1380px;margin:auto;padding:24px}header{text-align:center;margin-bottom:20px}header .eyebrow{font-size:.9rem;letter-spacing:.25em;font-weight:800;color:#8c6734}h1{font-family:Georgia,serif;font-size:clamp(2.5rem,5vw,4.6rem);margin:4px 0}header p{font-size:1.2rem;margin:6px;color:#567060}.now{font-size:clamp(1.1rem,2.4vw,1.65rem);font-weight:800;text-align:center;margin:16px 0}.layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr);gap:20px;align-items:stretch}.clock{min-height:400px;background:linear-gradient(135deg,#244c39,#102a21);border:10px solid #79937c;border-radius:22px;color:white;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:20px;text-align:center}.phase{font-size:clamp(1.2rem,2.3vw,2rem);font-weight:850;letter-spacing:.15em;color:#e1b875}.count{font-weight:900;font-size:clamp(5rem,12vw,11rem);font-variant-numeric:tabular-nums;letter-spacing:-.07em;line-height:1.1;white-space:nowrap}.range{font-size:clamp(1.1rem,2vw,1.6rem);color:#d8e3da}.side{background:#fff;border:1px solid #c9d9c7;border-radius:18px;padding:28px}.side h2{font-family:Georgia,serif;font-size:1.9rem;margin:0 0 15px}.side .next{font-size:1.8rem;font-weight:850;color:#24533b}.side .small{font-size:1.1rem;color:#597064;margin:9px 0 25px}.side label{font-weight:800;display:block;margin:16px 0 6px}.side input{font:inherit;font-size:1.15rem;padding:10px;border:1px solid #9caf9f;border-radius:8px;width:100%;max-width:230px}.side .help{font-size:.88rem;color:#607466;line-height:1.4}.bar{height:16px;border-radius:99px;background:#d6dfd1;overflow:hidden;margin:22px 0}.fill{height:100%;width:0;background:#c89d53;transition:width .4s}.notice{text-align:center;font-weight:800;font-size:1.1rem;min-height:1.5em}.buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px}button{cursor:pointer;background:#204d37;color:#fff;border:0;border-radius:9px;font-size:1rem;font-weight:800;padding:12px 20px}.secondary{background:#e2e8dc;color:#234631}.warning .clock{background:linear-gradient(135deg,#6a4621,#3d2c1c);border-color:#d2a354}.break .clock{background:linear-gradient(135deg,#285c69,#123641);border-color:#74a4ae}.status{text-align:center;color:#617265;font-size:.92rem;margin:14px 0}@media(max-width:820px){main{padding:14px}.layout{grid-template-columns:1fr}.clock{min-height:310px}.count{font-size:clamp(4.3rem,14vw,8rem)}.side{padding:22px}}#screen:fullscreen{max-width:none;width:100%;height:100vh;background:#f4f1e7;overflow:auto;display:flex;flex-direction:column;justify-content:center}#screen:fullscreen .layout{width:100%}#screen:fullscreen .clock{min-height:44vh}#screen:fullscreen .count{font-size:clamp(6rem,14vw,15rem)}
+
+/* Brainy Yaks team colors: bold black and yellow */
+:root{color:#181818;background:#fff9db}
+body{background:#fff9db;color:#171717}
+header .eyebrow{color:#775800}
+header p,.status{color:#514b34}
+.now{color:#171717}
+.clock{background:linear-gradient(135deg,#222 0%,#050505 100%);border-color:#f4c524;color:#fff}
+.phase{color:#ffda42}
+.count{color:#fff;text-shadow:0 3px 12px #000}
+.range{color:#ffe68d}
+.side{background:#fffdf2;border-color:#e1c65d;color:#171717}
+.side .next{color:#191919}
+.side .small,.side .help{color:#5e563b}
+.side input{border-color:#b69b30;background:#fff;color:#111}
+.bar{background:#e5dbb4}
+.fill{background:#f1c326}
+button{background:#f1c326;color:#111}
+button.secondary{background:#222;color:#fff}
+.warning .clock{background:linear-gradient(135deg,#5a280e,#1c100b);border-color:#ffba29}
+.break .clock{background:linear-gradient(135deg,#443900,#161400);border-color:#ffdc40}
+#screen:fullscreen{background:#fff9db}
 </style></head><body><main id="screen"><header><div class="eyebrow">CANNON SCHOOL ROBOTICS</div><h1>Brainy Yaks Practice Clock</h1><p>3:00–4:30 PM · Figure it out. Build together.</p></header><div class="now" id="now">Loading time…</div><div class="layout"><section class="clock" aria-live="off"><div class="phase" id="phase">PRACTICE</div><div class="count" id="count">--:--</div><div class="range" id="range">3:00–4:30 PM</div></section><aside class="side"><h2>Practice Plan</h2><div class="next" id="next">Loading…</div><div class="small" id="nexttime"></div><label for="breakStart">Five-minute break starts at</label><input id="breakStart" type="time" min="15:00" max="16:20" step="300" value="15:45"><p class="help">Choose a time between 3:00 and 4:20 PM. Your choice is saved on this device. The break always lasts five minutes.</p><div class="small">Cleanup warning: <strong>4:25 PM</strong><br>Practice ends: <strong>4:30 PM</strong></div></aside></div><div class="bar"><div class="fill" id="fill"></div></div><div class="notice" id="notice"></div><div class="buttons"><button id="full">Full Screen</button><button class="secondary" id="reset">Reset Break to 3:45</button></div><div class="status">Times shown in Eastern Time · Settings are saved only in this browser.</div></main>
 <script>
 const $=id=>document.getElementById(id),tz='America/New_York',start=900,end=990,cleanup=985;const stored=localStorage.getItem('brainy-yaks-break');if(stored&&/^1[56]:[0-5][0-9]$/.test(stored))$('breakStart').value=stored;
