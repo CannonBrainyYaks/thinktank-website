@@ -15,7 +15,7 @@
 'use strict';
 const KEY='tinkerteacher-task-board-v1';
 const supa=window.supabase?window.supabase.createClient('https://zsduepkuqukltjmvqjyi.supabase.co','sb_publishable_hC1Om-qG7Crbohs3ShliyQ_xWzxSP2y',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
-let currentUser=null, cloudReady=false, syncChain=Promise.resolve(), pendingSync=0;
+let currentUser=null, cloudReady=false, syncChain=Promise.resolve(), pendingSync=0, knownIds=new Set();
 const statusText=t=>{document.querySelector('#sync-status').textContent=t};
 const taskRow=(t,i)=>({id:t.id,user_id:currentUser.id,title:t.title,start_date:t.start||null,priority:t.priority||'Medium',status:t.status,sort_order:i,completed_at:t.completedAt||null,created_at:t.createdAt||new Date().toISOString()});
 const fromRow=t=>({id:t.id,title:t.title,start:t.start_date||'',priority:t.priority,status:t.status,completedAt:t.completed_at,createdAt:t.created_at});
@@ -35,7 +35,7 @@ async function initializeCloud(user){
        remote.push(...newTasks);
      }
    }
-   localStorage.setItem(migratedKey,'yes');tasks=remote;localStorage.setItem(KEY,JSON.stringify(tasks));
+   localStorage.setItem(migratedKey,'yes');tasks=remote;knownIds=new Set(remote.map(t=>t.id));localStorage.setItem(KEY,JSON.stringify(tasks));
    cloudReady=true;render();statusText('Synced'); 
  }catch(e){cloudReady=false;statusText('Could not load tasks: '+e.message);document.querySelector('#task-app').hidden=true;document.querySelector('#signin-panel').hidden=false;document.querySelector('#signin-message').textContent='Connection problem: '+e.message;}
 }
@@ -47,14 +47,14 @@ function queueSync(){
    const rows=snapshot.map(taskRow);
    if(rows.length){const {error}=await supa.from('personal_tasks').upsert(rows,{onConflict:'id'});if(error)throw error}
    const remote=await fetchCloud();const ids=new Set(snapshot.map(t=>t.id));
-   const deleted=remote.filter(t=>!ids.has(t.id)).map(t=>t.id);
+   const deleted=[...knownIds].filter(id=>!ids.has(id));
    if(deleted.length){const {error}=await supa.from('personal_tasks').delete().in('id',deleted);if(error)throw error}
-   pendingSync--;if(!pendingSync)statusText('Synced');
+   knownIds=new Set(snapshot.map(t=>t.id));pendingSync--;if(!pendingSync)statusText('Synced');
  }).catch(e=>{pendingSync=Math.max(0,pendingSync-1);statusText('Sync failed: '+e.message+' — export a backup before leaving');console.error('Sync failed',e)});
 }
 async function refreshCloud(){
  if(!cloudReady||pendingSync)return;
- try{const remote=await fetchCloud();if(!cloudReady)return;tasks=remote;localStorage.setItem(KEY,JSON.stringify(tasks));render();statusText('Synced')}catch(e){statusText('Refresh failed: '+e.message)}
+ try{const remote=await fetchCloud();if(!cloudReady)return;tasks=remote;knownIds=new Set(remote.map(t=>t.id));localStorage.setItem(KEY,JSON.stringify(tasks));render();statusText('Synced')}catch(e){statusText('Refresh failed: '+e.message)}
 }
 document.querySelector('#signin-form').addEventListener('submit',async e=>{
  e.preventDefault();const email=document.querySelector('#signin-email').value.trim();
